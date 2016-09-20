@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 
+import com.jtechlib.view.widget.ToolbarChain;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
@@ -56,6 +58,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.setContentView(layoutResID);
         //绑定注解
         ButterKnife.bind(getActivity());
+    }
+
+    /**
+     * 设置toolbar
+     *
+     * @param toolbar
+     * @return
+     */
+    public ToolbarChain setupToolbar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+        return new ToolbarChain(getActivity(), toolbar);
     }
 
     /**

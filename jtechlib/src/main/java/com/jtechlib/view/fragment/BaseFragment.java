@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.single.PermissionListener;
+
 import butterknife.ButterKnife;
 
 /**
@@ -80,10 +84,23 @@ public abstract class BaseFragment extends Fragment {
     }
 
     /**
-     * 后退方法
+     * 权限检查 单个
+     *
+     * @param permission
+     * @param permissionListener
      */
-    public void keyBack() {
-        getActivity().finish();
+    public void checkPermission(PermissionListener permissionListener, String permission) {
+        Dexter.checkPermission(permissionListener, permission);
+    }
+
+    /**
+     * 权限检查 多个
+     *
+     * @param multiplePermissionsListener
+     * @param permissions
+     */
+    public void checkPermission(MultiplePermissionsListener multiplePermissionsListener, String... permissions) {
+        Dexter.checkPermissions(multiplePermissionsListener, permissions);
     }
 
     @Override

@@ -57,5 +57,5 @@ public abstract class BaseApplication extends Application {
      *
      * @return
      */
-    abstract String getDBName();
+    protected abstract String getDBName();
 }
