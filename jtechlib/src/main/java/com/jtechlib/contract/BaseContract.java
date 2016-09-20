@@ -10,6 +10,5 @@ public interface BaseContract {
     }
 
     interface View {
-        void setPresenter(BaseContract.Presenter presenter);
     }
 }

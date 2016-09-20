@@ -1,6 +1,7 @@
 package com.jtechlib.view.widget;
 
 import android.content.Context;
+import android.support.annotation.MenuRes;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -49,6 +50,11 @@ public class ToolbarChain {
     public ToolbarChain setNavigationIcon(int resId, View.OnClickListener onClickListener) {
         toolbar.setNavigationIcon(resId);
         toolbar.setNavigationOnClickListener(onClickListener);
+        return this;
+    }
+
+    public ToolbarChain inflateMenu(@MenuRes int resId) {
+        toolbar.inflateMenu(resId);
         return this;
     }
 
