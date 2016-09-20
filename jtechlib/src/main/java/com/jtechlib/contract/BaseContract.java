@@ -7,7 +7,6 @@ package com.jtechlib.contract;
 public interface BaseContract {
 
     interface Presenter {
-        void setView(BaseContract.View view);
     }
 
     interface View {
