@@ -4,9 +4,6 @@ import android.app.Application;
 
 import com.karumi.dexter.Dexter;
 
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-
 /**
  * Application基类
  * Created by wuxubaiyang on 16/4/21.
@@ -32,30 +29,4 @@ public abstract class BaseApplication extends Application {
     public static BaseApplication getInstance() {
         return INSTANCE;
     }
-
-    /**
-     * 初始化realm
-     */
-    public Realm getRealm() {
-        return Realm.getInstance(getRealmConfiguration());
-    }
-
-    /**
-     * 获取数据库配置信息
-     *
-     * @return
-     */
-    private RealmConfiguration getRealmConfiguration() {
-        return new RealmConfiguration
-                .Builder(getApplicationContext())
-                .name(getDBName())
-                .build();
-    }
-
-    /**
-     * 获取数据库名称
-     *
-     * @return
-     */
-    protected abstract String getDBName();
 }

@@ -7,8 +7,5 @@ import com.jtechlib.BaseApplication;
  * Created by jianghan on 2016/9/20.
  */
 public class TestApplication extends BaseApplication {
-    @Override
-    protected String getDBName() {
-        return "TestDb";
-    }
+
 }
