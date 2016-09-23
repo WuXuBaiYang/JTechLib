@@ -6,7 +6,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 
 import com.jtechlib.view.widget.ToolbarChain;
 import com.karumi.dexter.Dexter;
@@ -111,27 +110,6 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     public void checkPermission(MultiplePermissionsListener multiplePermissionsListener, String... permissions) {
         Dexter.checkPermissions(multiplePermissionsListener, permissions);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        boolean onKey = true;
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                keyBack();
-                break;
-            default:
-                onKey = super.onKeyDown(keyCode, event);
-                break;
-        }
-        return onKey;
-    }
-
-    /**
-     * 响应后退按键
-     */
-    public void keyBack() {
-        finish();
     }
 
     @Override
