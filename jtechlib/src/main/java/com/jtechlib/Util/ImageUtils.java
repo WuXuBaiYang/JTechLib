@@ -7,6 +7,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -87,12 +88,28 @@ public class ImageUtils {
     }
 
     /**
+     * 请求图片
+     *
+     * @param context
+     * @param uri
+     * @param action
+     */
+    public static void requestImage(final Context context, String uri, Action1<? super Bitmap> action) {
+        requestImage(context, uri, action, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Log.e("ImageLoadError", throwable.getMessage());
+            }
+        });
+    }
+
+    /**
      * 请求图片，回调bitmap
      *
      * @param context
      * @param uri
      */
-    public static void requestImage(final Context context, String uri, Action1<? super Bitmap> action) {
+    public static void requestImage(final Context context, String uri, Action1<? super Bitmap> action, Action1<Throwable> action1) {
         Observable.just(uri)
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<String, Bitmap>() {
@@ -117,7 +134,7 @@ public class ImageUtils {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(action);
+                .subscribe(action, action1);
     }
 
     /**
