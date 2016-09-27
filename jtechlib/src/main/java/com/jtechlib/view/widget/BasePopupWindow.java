@@ -3,9 +3,14 @@ package com.jtechlib.view.widget;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.ColorRes;
+import android.support.annotation.LayoutRes;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
+
+import butterknife.ButterKnife;
 
 /**
  * popupwindow基类
@@ -36,6 +41,21 @@ public abstract class BasePopupWindow extends PopupWindow {
         this.setOutsideTouchable(true);
         this.setAnimationStyle(0);
         this.setFocusable(true);
+    }
+
+    /**
+     * 设置视图
+     *
+     * @param resId
+     */
+    public void setContentView(@LayoutRes int resId) {
+        setContentView(LayoutInflater.from(getContext()).inflate(resId, null, false));
+    }
+
+    @Override
+    public void setContentView(View contentView) {
+        ButterKnife.bind(this, contentView);
+        super.setContentView(contentView);
     }
 
     /**
