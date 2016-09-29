@@ -2,6 +2,8 @@ package com.jtechlib.view.widget;
 
 import android.content.Context;
 import android.support.annotation.MenuRes;
+import android.support.annotation.StringRes;
+import android.support.annotation.StyleRes;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -17,13 +19,28 @@ public class ToolbarChain {
         this.toolbar = toolbar;
     }
 
-    public ToolbarChain setTitle(int resId) {
+    public ToolbarChain setTitle(@StringRes int resId) {
         toolbar.setTitle(resId);
         return this;
     }
 
-    public ToolbarChain setSubTitle(int resId) {
+    public ToolbarChain setTitle(CharSequence title) {
+        toolbar.setTitle(title);
+        return this;
+    }
+
+    public ToolbarChain setSubTitle(@StringRes int resId) {
         toolbar.setSubtitle(resId);
+        return this;
+    }
+
+    public ToolbarChain setSubTitle(CharSequence title) {
+        toolbar.setSubtitle(title);
+        return this;
+    }
+
+    public ToolbarChain setTitleTextAppearance(Context context, @StyleRes int resId) {
+        toolbar.setTitleTextAppearance(context, resId);
         return this;
     }
 
@@ -60,6 +77,26 @@ public class ToolbarChain {
 
     public ToolbarChain setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener onMenuItemClickListener) {
         toolbar.setOnMenuItemClickListener(onMenuItemClickListener);
+        return this;
+    }
+
+    public ToolbarChain setContentInsetStartWithNavigation(int insetStartWithNavigation) {
+        toolbar.setContentInsetStartWithNavigation(insetStartWithNavigation);
+        return this;
+    }
+
+    public ToolbarChain setContentInsetEndWithActions(int insetEndWithActions) {
+        toolbar.setContentInsetEndWithActions(insetEndWithActions);
+        return this;
+    }
+
+    public ToolbarChain setContentInsetsAbsolute(int contentInsetLeft, int contentInsetRight) {
+        toolbar.setContentInsetsAbsolute(contentInsetLeft, contentInsetRight);
+        return this;
+    }
+
+    public ToolbarChain setContentInsetsRelative(int contentInsetStart, int contentInsetEnd) {
+        toolbar.setContentInsetsRelative(contentInsetStart, contentInsetEnd);
         return this;
     }
 }
