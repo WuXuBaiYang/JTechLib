@@ -1,55 +1,54 @@
-# Local per-repo rules can be added to the .git/info/exclude file in your
-
-# repo. These rules are not committed with the repo so they are not shared
-
-# with others. This method can be used for locally-generated files that you
-
-# don’t expect other users to generate, like files created by your editor.
-
-.settings
-
-.classpath
-
+#Android generated
 bin
-
-coverage
-
-coverage.ec
-
-coverage.em
-
 gen
+lint.xml
+lint
 
-javadoc
+#Eclipse
+.project
+.classpath
+.settings
+.checkstyle
 
-junit-report.xml
-
-lint-results.*ml
-
-lint-results_files
-
-local.properties
-
-monkey.txt
-
-*~
-
+#IntelliJ IDEA
+.idea
+*.iml
+*.ipr
 *.iws
+classes
+gen-external-apklibs
 
-atlassian-ide-plugin.xml
-
-target
-
-build
-
+#gradle
 .gradle
+local.properties
+gradlew
+gradlew.bat
+gradle/
+build/
 
-out
+#vi
+*.swp
 
+#other editors
+*.bak
+
+#Maven
+target
+release.properties
+pom.xml.*
+
+#Ant
 build.xml
-
+ant.properties
+local.properties
+proguard.cfg
 proguard-project.txt
 
-.idea/
-
-*.iml
+#Other
+.DS_Store
+Thumbs.db
+tmp
+*.tgz
+*.lock
+*.lck
+com_crashlytics_export_strings.xml
