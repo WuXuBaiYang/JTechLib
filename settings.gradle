@@ -1,1 +1,1 @@
-include ':app', ':jtechlib'
+include ':simple', ':jtechlib'
