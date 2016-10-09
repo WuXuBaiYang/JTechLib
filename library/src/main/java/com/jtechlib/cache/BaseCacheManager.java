@@ -78,7 +78,7 @@ public abstract class BaseCacheManager {
      * @return 是否插入成功
      */
     public boolean insert(@NonNull String key, @NonNull Object value, int saveTime) {
-        String valueName = value.getClass().getName();
+        String clazzType = value.getClass().getName();
         if (value instanceof Byte[]) {//为byte[]类型
             insertByte(key, (Byte[]) value, saveTime);
         } else if (value instanceof String) {//为String类型
@@ -87,13 +87,13 @@ public abstract class BaseCacheManager {
             insertJsonObject(key, (JSONObject) value, saveTime);
         } else if (value instanceof JSONArray) {//jsonarray对象
             insertJsonArray(key, (JSONArray) value, saveTime);
-        } else if (value instanceof Integer || "int".equals(valueName)) {//是否为int或者int封装类型
+        } else if (value instanceof Integer || "int".equals(clazzType)) {//是否为int或者int封装类型
             return insertInt(key, (Integer) value);
-        } else if (value instanceof Boolean || "boolean".equals(valueName)) {//是否为boolean或者boolean封装类型
+        } else if (value instanceof Boolean || "boolean".equals(clazzType)) {//是否为boolean或者boolean封装类型
             return insertBoolean(key, (Boolean) value);
-        } else if (value instanceof Float || "float".equals(valueName)) {//是否为float或者float封装类型
+        } else if (value instanceof Float || "float".equals(clazzType)) {//是否为float或者float封装类型
             return insertFloat(key, (Float) value);
-        } else if (value instanceof Long || "long".equals(valueName)) {//是否为long或者long封装类型
+        } else if (value instanceof Long || "long".equals(clazzType)) {//是否为long或者long封装类型
             return instertLong(key, (Long) value);
         } else if (value instanceof Serializable) {//实现了序列化接口
             insertSerializable(key, (Serializable) value, saveTime);
@@ -298,46 +298,14 @@ public abstract class BaseCacheManager {
         return insert(key, newValue, saveTime);
     }
 
-
-    /**
-     * 根据key查询数据
-     *
-     * @param key
-     * @param <R>
-     * @return
-     */
-    private <R> R query(@NonNull String key, @NonNull Class<?> clazz) {
-        Preconditions.checkNotNull(aCache, "请实例化context构造");
-        if (clazz == Byte[].class) {
-            return (R) getACache().getAsBinary(key);
-        } else if (clazz == String.class) {
-            return (R) aCache.getAsString(key);
-        } else if (clazz == Serializable.class) {
-            return (R) aCache.getAsObject(key);
-        } else if (clazz == JSONObject.class) {
-            return (R) aCache.getAsJSONObject(key);
-        } else if (clazz == JSONArray.class) {
-            return (R) aCache.getAsJSONArray(key);
-        } else if (clazz == Integer.class || "int".equals(clazz.getName())) {
-            return (R) new Integer(getSharedPreferences().getInt(key, 0));
-        } else if (clazz == Boolean.class || "boolean".equals(clazz.getName())) {
-            return (R) new Boolean(getSharedPreferences().getBoolean(key, false));
-        } else if (clazz == Float.class || "float".equals(clazz.getName())) {
-            return (R) new Float(getSharedPreferences().getFloat(key, 0F));
-        } else if (clazz == Long.class || "long".equals(clazz.getName())) {
-            return (R) new Long(getSharedPreferences().getLong(key, 0L));
-        }
-        return null;
-    }
-
     /**
      * 查byte[]类型
      *
      * @param key
      * @return
      */
-    public Byte[] queryBinary(@NonNull String key) {
-        return query(key, Byte[].class);
+    public byte[] queryBinary(@NonNull String key) {
+        return getACache().getAsBinary(key);
     }
 
     /**
@@ -347,7 +315,7 @@ public abstract class BaseCacheManager {
      * @return
      */
     public String queryString(@NonNull String key) {
-        return query(key, String.class);
+        return getACache().getAsString(key);
     }
 
     /**
@@ -356,8 +324,8 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public <R> R queryObject(@NonNull String key) {
-        return query(key, Serializable.class);
+    public <R> R querySerializable(@NonNull String key) {
+        return (R) getACache().getAsObject(key);
     }
 
     /**
@@ -367,7 +335,7 @@ public abstract class BaseCacheManager {
      * @return
      */
     public JSONObject queryJsonObject(@NonNull String key) {
-        return query(key, JSONObject.class);
+        return getACache().getAsJSONObject(key);
     }
 
     /**
@@ -377,7 +345,7 @@ public abstract class BaseCacheManager {
      * @return
      */
     public JSONArray queryJsonArray(@NonNull String key) {
-        return query(key, JSONArray.class);
+        return getACache().getAsJSONArray(key);
     }
 
     /**
@@ -386,8 +354,8 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public int queryInt(@NonNull String key) {
-        return query(key, Integer.class);
+    public int queryInt(@NonNull String key, int defValut) {
+        return getSharedPreferences().getInt(key, defValut);
     }
 
     /**
@@ -396,8 +364,8 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public boolean queryBoolean(@NonNull String key) {
-        return query(key, Boolean.class);
+    public boolean queryBoolean(@NonNull String key, boolean defValue) {
+        return getSharedPreferences().getBoolean(key, defValue);
     }
 
     /**
@@ -406,8 +374,8 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public float queryFloat(@NonNull String key) {
-        return query(key, Float.class);
+    public float queryFloat(@NonNull String key, float defValue) {
+        return getSharedPreferences().getFloat(key, defValue);
     }
 
     /**
@@ -416,8 +384,8 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public long queryLong(@NonNull String key) {
-        return query(key, Long.class);
+    public long queryLong(@NonNull String key, long defVlaue) {
+        return getSharedPreferences().getLong(key, defVlaue);
     }
 
     /**
