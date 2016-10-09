@@ -1,6 +1,7 @@
 package com.jtechlib.cache;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.jakewharton.rxbinding.internal.Preconditions;
@@ -16,40 +17,49 @@ import java.io.Serializable;
  */
 public abstract class BaseCacheManager {
 
+    private Context context;
+
+    private int mode;
     private ACache aCache;
+    private SharedPreferences sharedPreferences;
 
     public BaseCacheManager(Context context) {
-        aCache = ACache.get(context, getCacheName());
+        this(context, Context.MODE_PRIVATE);
+    }
+
+    public BaseCacheManager(Context context, int mode) {
+        this.context = context;
+        this.mode = mode;
     }
 
     /**
-     * * 插入数据
+     * 懒加载acache对象
      *
-     * @param key      存储Key
-     * @param value    类型限制：byte[]/String/serializable/jsonobject/jsonarray
-     * @param saveTime 存储时间，单位（秒）
-     * @return 是否插入成功
+     * @return
      */
-    public boolean insert(@NonNull String key, @NonNull Object value, int saveTime) {
-        Preconditions.checkNotNull(aCache, "请实例化context构造");
-        if (value instanceof Byte[]) {
-            aCache.put(key, (byte[]) value, saveTime);
-        } else if (value instanceof String) {
-            aCache.put(key, (String) value, saveTime);
-        } else if (value instanceof Serializable) {
-            aCache.put(key, (Serializable) value, saveTime);
-        } else if (value instanceof JSONObject) {
-            aCache.put(key, (JSONObject) value, saveTime);
-        } else if (value instanceof JSONArray) {
-            aCache.put(key, (JSONArray) value, saveTime);
-        } else {
-            return false;
+    private ACache getACache() {
+        Preconditions.checkNotNull(context, "请实例化context构造");
+        if (null == aCache) {
+            this.aCache = ACache.get(context, getCacheName());
         }
-        return true;
+        return aCache;
     }
 
     /**
-     * 封装方法
+     * 懒加载SharedPreferences对象
+     *
+     * @return
+     */
+    private SharedPreferences getSharedPreferences() {
+        Preconditions.checkNotNull(context, "请实例化context构造");
+        if (null == sharedPreferences) {
+            this.sharedPreferences = context.getSharedPreferences(getCacheName(), mode);
+        }
+        return sharedPreferences;
+    }
+
+    /**
+     * 插入数据
      *
      * @param key
      * @param value
@@ -60,14 +70,223 @@ public abstract class BaseCacheManager {
     }
 
     /**
+     * 插入数据
+     *
+     * @param key      存储Key
+     * @param value    类型限制：byte[]/String/serializable/jsonobject/jsonarray
+     * @param saveTime 存储时间，单位（秒）
+     * @return 是否插入成功
+     */
+    public boolean insert(@NonNull String key, @NonNull Object value, int saveTime) {
+        String valueName = value.getClass().getName();
+        if (value instanceof Byte[]) {//为byte[]类型
+            insertByte(key, (Byte[]) value, saveTime);
+        } else if (value instanceof String) {//为String类型
+            insertString(key, (String) value, saveTime);
+        } else if (value instanceof Serializable) {//实现了序列化接口
+            insertSerializable(key, (Serializable) value, saveTime);
+        } else if (value instanceof JSONObject) {//jsonobject对象
+            insertJsonObject(key, (JSONObject) value, saveTime);
+        } else if (value instanceof JSONArray) {//jsonarray对象
+            insertJsonArray(key, (JSONArray) value, saveTime);
+        } else if (value instanceof Integer || "int".equals(valueName)) {//是否为int或者int封装类型
+            return insertInt(key, (Integer) value);
+        } else if (value instanceof Boolean || "boolean".equals(valueName)) {//是否为boolean或者boolean封装类型
+            return insertBoolean(key, (Boolean) value);
+        } else if (value instanceof Float || "float".equals(valueName)) {//是否为float或者float封装类型
+            return insertFloat(key, (Float) value);
+        } else if (value instanceof Long || "long".equals(valueName)) {//是否为long或者long封装类型
+            return instertLong(key, (Long) value);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 插入byte[]类型
+     *
+     * @param key
+     * @param value
+     */
+    public void insertByte(String key, Byte[] value, int saveTime) {
+        getACache().put(key, value, saveTime);
+    }
+
+    /**
+     * 插入byte[]类型
+     *
+     * @param key
+     * @param value
+     */
+    public void insertByte(String key, Byte[] value) {
+        insertByte(key, value, -1);
+    }
+
+    /**
+     * 插入string类型
+     *
+     * @param key
+     * @param value
+     */
+    public void insertString(String key, String value, int saveTime) {
+        getACache().put(key, value, saveTime);
+    }
+
+    /**
+     * 插入string类型
+     *
+     * @param key
+     * @param value
+     */
+    public void insertString(String key, String value) {
+        insertString(key, value, -1);
+    }
+
+    /**
+     * 插入实现了serializable接口的对象
+     *
+     * @param key
+     * @param value
+     * @param <D>
+     */
+    public <D extends Serializable> void insertSerializable(String key, D value, int saveTime) {
+        getACache().put(key, value, saveTime);
+    }
+
+
+    /**
+     * 插入实现了serializable接口的对象
+     *
+     * @param key
+     * @param value
+     * @param <D>
+     */
+    public <D extends Serializable> void insertSerializable(String key, D value) {
+        getACache().put(key, value, -1);
+    }
+
+    /**
+     * 插入jsonobject对象
+     *
+     * @param key
+     * @param value
+     */
+    public void insertJsonObject(String key, JSONObject value, int saveTime) {
+        getACache().put(key, value, saveTime);
+    }
+
+    /**
+     * 插入jsonobject对象
+     *
+     * @param key
+     * @param value
+     */
+    public void insertJsonObject(String key, JSONObject value) {
+        getACache().put(key, value, -1);
+    }
+
+    /**
+     * 插入jsonarray对象
+     *
+     * @param key
+     * @param value
+     */
+    public void insertJsonArray(String key, JSONArray value, int saveTime) {
+        getACache().put(key, value, saveTime);
+    }
+
+    /**
+     * 插入jsonarray对象
+     *
+     * @param key
+     * @param value
+     */
+    public void insertJsonArray(String key, JSONArray value) {
+        getACache().put(key, value, -1);
+    }
+
+    /**
+     * 插入int类型数据
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean insertInt(String key, int value) {
+        return getSharedPreferences()
+                .edit()
+                .putInt(key, value)
+                .commit();
+    }
+
+    /**
+     * 插入boolean类型数据
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean insertBoolean(String key, boolean value) {
+        return getSharedPreferences()
+                .edit()
+                .putBoolean(key, value)
+                .commit();
+    }
+
+    /**
+     * 插入float类型
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean insertFloat(String key, float value) {
+        return getSharedPreferences()
+                .edit()
+                .putFloat(key, value)
+                .commit();
+    }
+
+    /**
+     * 插入long类型
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean instertLong(String key, long value) {
+        return getSharedPreferences()
+                .edit()
+                .putLong(key, value)
+                .commit();
+    }
+
+    /**
      * 删除文件
      *
      * @param key
      * @return
      */
     public boolean delete(@NonNull String key) {
-        Preconditions.checkNotNull(aCache, "请实例化context构造");
-        return aCache.remove(key);
+        if (!getACache().remove(key)) {
+            return getSharedPreferences()
+                    .edit()
+                    .remove(key)
+                    .commit();
+        }
+        return true;
+    }
+
+    /**
+     * 更新数据
+     *
+     * @param key
+     * @param newValue
+     * @return
+     */
+    public boolean update(@NonNull String key, @NonNull Object newValue) {
+        return update(key, newValue, -1);
     }
 
     /**
@@ -79,21 +298,9 @@ public abstract class BaseCacheManager {
      * @return
      */
     public boolean update(@NonNull String key, @NonNull Object newValue, int saveTime) {
-        Preconditions.checkNotNull(aCache, "请实例化context构造");
-        //使用新数据覆盖已有数据
         return insert(key, newValue, saveTime);
     }
 
-    /**
-     * 封装方法
-     *
-     * @param key
-     * @param newValue
-     * @return
-     */
-    public boolean update(@NonNull String key, @NonNull Object newValue) {
-        return update(key, newValue, -1);
-    }
 
     /**
      * 根据key查询数据
@@ -105,7 +312,7 @@ public abstract class BaseCacheManager {
     private <R> R query(@NonNull String key, @NonNull Class<?> clazz) {
         Preconditions.checkNotNull(aCache, "请实例化context构造");
         if (clazz == Byte[].class) {
-            return (R) aCache.getAsBinary(key);
+            return (R) getACache().getAsBinary(key);
         } else if (clazz == String.class) {
             return (R) aCache.getAsString(key);
         } else if (clazz == Serializable.class) {
@@ -114,6 +321,14 @@ public abstract class BaseCacheManager {
             return (R) aCache.getAsJSONObject(key);
         } else if (clazz == JSONArray.class) {
             return (R) aCache.getAsJSONArray(key);
+        } else if (clazz == Integer.class || "int".equals(clazz.getName())) {
+            return (R) new Integer(getSharedPreferences().getInt(key, 0));
+        } else if (clazz == Boolean.class || "boolean".equals(clazz.getName())) {
+            return (R) new Boolean(getSharedPreferences().getBoolean(key, false));
+        } else if (clazz == Float.class || "float".equals(clazz.getName())) {
+            return (R) new Float(getSharedPreferences().getFloat(key, 0F));
+        } else if (clazz == Long.class || "long".equals(clazz.getName())) {
+            return (R) new Long(getSharedPreferences().getLong(key, 0L));
         }
         return null;
     }
@@ -166,6 +381,46 @@ public abstract class BaseCacheManager {
      */
     public JSONArray queryJsonArray(@NonNull String key) {
         return query(key, JSONArray.class);
+    }
+
+    /**
+     * 查询int
+     *
+     * @param key
+     * @return
+     */
+    public int queryInt(@NonNull String key) {
+        return query(key, Integer.class);
+    }
+
+    /**
+     * 查询boolean
+     *
+     * @param key
+     * @return
+     */
+    public boolean queryBoolean(@NonNull String key) {
+        return query(key, Boolean.class);
+    }
+
+    /**
+     * 查询float
+     *
+     * @param key
+     * @return
+     */
+    public float queryFloat(@NonNull String key) {
+        return query(key, Float.class);
+    }
+
+    /**
+     * 查询long
+     *
+     * @param key
+     * @return
+     */
+    public long queryLong(@NonNull String key) {
+        return query(key, Long.class);
     }
 
     /**
