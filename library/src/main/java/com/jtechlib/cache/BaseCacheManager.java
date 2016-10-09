@@ -83,8 +83,6 @@ public abstract class BaseCacheManager {
             insertByte(key, (Byte[]) value, saveTime);
         } else if (value instanceof String) {//为String类型
             insertString(key, (String) value, saveTime);
-        } else if (value instanceof Serializable) {//实现了序列化接口
-            insertSerializable(key, (Serializable) value, saveTime);
         } else if (value instanceof JSONObject) {//jsonobject对象
             insertJsonObject(key, (JSONObject) value, saveTime);
         } else if (value instanceof JSONArray) {//jsonarray对象
@@ -97,6 +95,8 @@ public abstract class BaseCacheManager {
             return insertFloat(key, (Float) value);
         } else if (value instanceof Long || "long".equals(valueName)) {//是否为long或者long封装类型
             return instertLong(key, (Long) value);
+        } else if (value instanceof Serializable) {//实现了序列化接口
+            insertSerializable(key, (Serializable) value, saveTime);
         } else {
             return false;
         }
@@ -269,13 +269,10 @@ public abstract class BaseCacheManager {
      * @return
      */
     public boolean delete(@NonNull String key) {
-        if (!getACache().remove(key)) {
-            return getSharedPreferences()
-                    .edit()
-                    .remove(key)
-                    .commit();
-        }
-        return true;
+        return getACache().remove(key) || getSharedPreferences()
+                .edit()
+                .remove(key)
+                .commit();
     }
 
     /**
