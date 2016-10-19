@@ -208,25 +208,25 @@ public final class ActivityJump {
         @Override
         public JumpBundle createBundle() {
             makeSceneTransitionDone();
-            return super.createBundle();
+            return builder.createBundle();
         }
 
         @Override
         public JumpBundle createBundle(@NonNull Bundle bundle) {
             makeSceneTransitionDone();
-            return super.createBundle(bundle);
+            return builder.createBundle(bundle);
         }
 
         @Override
         public void jump() {
             makeSceneTransitionDone();
-            super.jump();
+            builder.jump();
         }
 
         @Override
         public void jumpForResult(int requestCode) {
             makeSceneTransitionDone();
-            super.jumpForResult(requestCode);
+            builder.jumpForResult(requestCode);
         }
     }
 
@@ -631,25 +631,26 @@ public final class ActivityJump {
         @Override
         public JumpSceneTransition makeSceneTransitionAnimation() {
             bundleDone();
-            return super.makeSceneTransitionAnimation();
+            return builder.makeSceneTransitionAnimation();
         }
+
 
         @Override
         public JumpSceneTransition makeSceneTransitionAnimation(Activity activity) {
             bundleDone();
-            return super.makeSceneTransitionAnimation(activity);
+            return builder.makeSceneTransitionAnimation(activity);
         }
 
         @Override
         public void jump() {
             bundleDone();
-            super.jump();
+            builder.jump();
         }
 
         @Override
         public void jumpForResult(int requestCode) {
             bundleDone();
-            super.jumpForResult(requestCode);
+            builder.jumpForResult(requestCode);
         }
     }
 }
