@@ -44,9 +44,9 @@ public final class ActivityJump {
      * 构造器
      */
     public static class Builder {
-        private ActivityOptionsCompat activityOptionsCompat;
-        private Activity activity;
-        private Intent intent;
+        protected ActivityOptionsCompat activityOptionsCompat;
+        protected Activity activity;
+        protected Intent intent;
 
         private Builder() {
         }
@@ -74,7 +74,7 @@ public final class ActivityJump {
          * @return
          */
         public JumpBundle createBundle() {
-            return new JumpBundle(this);
+            return new JumpBundle(activity, activityOptionsCompat, intent);
         }
 
         /**
@@ -84,7 +84,7 @@ public final class ActivityJump {
          * @return
          */
         public JumpBundle createBundle(@NonNull Bundle bundle) {
-            return new JumpBundle(this, bundle);
+            return new JumpBundle(bundle, activity, activityOptionsCompat, intent);
         }
 
         public Builder makeBasic() {
@@ -126,7 +126,7 @@ public final class ActivityJump {
         }
 
         public JumpSceneTransition makeSceneTransitionAnimation(Activity activity) {
-            return new JumpSceneTransition(activity, this);
+            return new JumpSceneTransition(activity, activityOptionsCompat, intent);
         }
 
         public Builder makeSceneTransitionAnimation(Activity activity, Pair<View, String>... sharedElements) {
@@ -169,15 +169,14 @@ public final class ActivityJump {
     public final static class JumpSceneTransition extends Builder {
         private Activity activity;
         private List<Pair> pairs;
-        private Builder builder;
 
         private JumpSceneTransition() {
-
         }
 
-        private JumpSceneTransition(@NonNull Activity activity, @NonNull Builder builder) {
+        private JumpSceneTransition(@NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
+            this.activityOptionsCompat = activityOptionsCompat;
             this.activity = activity;
-            this.builder = builder;
+            this.intent = intent;
             //实例化pair集合
             pairs = new ArrayList<>();
         }
@@ -202,31 +201,17 @@ public final class ActivityJump {
          * @return
          */
         public Builder makeSceneTransitionDone() {
-            return builder.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
+            return super.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
         }
 
         @Override
         public JumpBundle createBundle() {
-            makeSceneTransitionDone();
-            return builder.createBundle();
+            return makeSceneTransitionDone().createBundle();
         }
 
         @Override
         public JumpBundle createBundle(@NonNull Bundle bundle) {
-            makeSceneTransitionDone();
-            return builder.createBundle(bundle);
-        }
-
-        @Override
-        public void jump() {
-            makeSceneTransitionDone();
-            builder.jump();
-        }
-
-        @Override
-        public void jumpForResult(int requestCode) {
-            makeSceneTransitionDone();
-            builder.jumpForResult(requestCode);
+            return makeSceneTransitionDone().createBundle(bundle);
         }
     }
 
@@ -234,17 +219,20 @@ public final class ActivityJump {
      * 链式调用的bundle
      */
     public final static class JumpBundle extends Builder {
-        private Builder builder;
         private Bundle bundle;
 
-        private JumpBundle(@NonNull Builder builder) {
-            this.builder = builder;
+        private JumpBundle(@NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
+            this.activityOptionsCompat = activityOptionsCompat;
+            this.activity = activity;
+            this.intent = intent;
             //实例化一个bundle
             bundle = new Bundle();
         }
 
-        private JumpBundle(@NonNull Builder builder, @NonNull Bundle bundle) {
-            this.builder = builder;
+        private JumpBundle(@NonNull Bundle bundle, @NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
+            this.activityOptionsCompat = activityOptionsCompat;
+            this.activity = activity;
+            this.intent = intent;
             this.bundle = bundle;
         }
 
@@ -625,32 +613,18 @@ public final class ActivityJump {
          * @return
          */
         public Builder bundleDone() {
-            return builder.addBundle(bundle);
+            return super.addBundle(bundle);
         }
 
         @Override
         public JumpSceneTransition makeSceneTransitionAnimation() {
-            bundleDone();
-            return builder.makeSceneTransitionAnimation();
+            return bundleDone().makeSceneTransitionAnimation();
         }
 
 
         @Override
         public JumpSceneTransition makeSceneTransitionAnimation(Activity activity) {
-            bundleDone();
-            return builder.makeSceneTransitionAnimation(activity);
-        }
-
-        @Override
-        public void jump() {
-            bundleDone();
-            builder.jump();
-        }
-
-        @Override
-        public void jumpForResult(int requestCode) {
-            bundleDone();
-            builder.jumpForResult(requestCode);
+            return bundleDone().makeSceneTransitionAnimation(activity);
         }
     }
 }
