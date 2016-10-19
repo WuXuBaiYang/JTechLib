@@ -1,7 +1,6 @@
 package com.jtechlib.Util;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -44,11 +43,14 @@ public final class ActivityJump {
      * 构造器
      */
     public static class Builder {
-        protected ActivityOptionsCompat activityOptionsCompat;
-        protected Activity activity;
-        protected Intent intent;
+        private ActivityOptionsCompat activityOptionsCompat;
+        private Activity activity;
+        private Intent intent;
 
-        private Builder() {
+        public Builder(ActivityOptionsCompat activityOptionsCompat, Activity activity, Intent intent) {
+            this.activityOptionsCompat = activityOptionsCompat;
+            this.activity = activity;
+            this.intent = intent;
         }
 
         private Builder(@NonNull Activity currentActivity, @NonNull Class<?> targetClazz) {
@@ -74,7 +76,7 @@ public final class ActivityJump {
          * @return
          */
         public JumpBundle createBundle() {
-            return new JumpBundle(activity, activityOptionsCompat, intent);
+            return new JumpBundle(activityOptionsCompat, activity, intent);
         }
 
         /**
@@ -84,7 +86,7 @@ public final class ActivityJump {
          * @return
          */
         public JumpBundle createBundle(@NonNull Bundle bundle) {
-            return new JumpBundle(bundle, activity, activityOptionsCompat, intent);
+            return new JumpBundle(activityOptionsCompat, activity, intent, bundle);
         }
 
         public Builder makeBasic() {
@@ -108,11 +110,7 @@ public final class ActivityJump {
         }
 
         public Builder makeCustomAnimation(int enterResId, int exitResId) {
-            return makeCustomAnimation(activity, enterResId, exitResId);
-        }
-
-        public Builder makeCustomAnimation(Context context, int enterResId, int exitResId) {
-            activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, enterResId, exitResId);
+            activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(activity, enterResId, exitResId);
             return this;
         }
 
@@ -122,14 +120,10 @@ public final class ActivityJump {
         }
 
         public JumpSceneTransition makeSceneTransitionAnimation() {
-            return makeSceneTransitionAnimation(activity);
+            return new JumpSceneTransition(activityOptionsCompat, activity, intent);
         }
 
-        public JumpSceneTransition makeSceneTransitionAnimation(Activity activity) {
-            return new JumpSceneTransition(activity, activityOptionsCompat, intent);
-        }
-
-        public Builder makeSceneTransitionAnimation(Activity activity, Pair<View, String>... sharedElements) {
+        public Builder makeSceneTransitionAnimation(Pair<View, String>... sharedElements) {
             activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, sharedElements);
             return this;
         }
@@ -169,13 +163,8 @@ public final class ActivityJump {
     public final static class JumpSceneTransition extends Builder {
         private List<Pair> pairs;
 
-        private JumpSceneTransition() {
-        }
-
-        private JumpSceneTransition(@NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
-            super.activityOptionsCompat = activityOptionsCompat;
-            super.activity = activity;
-            super.intent = intent;
+        public JumpSceneTransition(ActivityOptionsCompat activityOptionsCompat, Activity activity, Intent intent) {
+            super(activityOptionsCompat, activity, intent);
             //实例化pair集合
             pairs = new ArrayList<>();
         }
@@ -200,7 +189,7 @@ public final class ActivityJump {
          * @return
          */
         public Builder makeSceneTransitionDone() {
-            return super.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
+            return makeSceneTransitionAnimation(pairs.toArray(new Pair[pairs.size()]));
         }
 
         @Override
@@ -220,18 +209,14 @@ public final class ActivityJump {
     public final static class JumpBundle extends Builder {
         private Bundle bundle;
 
-        private JumpBundle(@NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
-            super.activityOptionsCompat = activityOptionsCompat;
-            super.activity = activity;
-            super.intent = intent;
+        private JumpBundle(ActivityOptionsCompat activityOptionsCompat, Activity activity, Intent intent) {
+            super(activityOptionsCompat, activity, intent);
             //实例化一个bundle
             bundle = new Bundle();
         }
 
-        private JumpBundle(@NonNull Bundle bundle, @NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
-            super.activityOptionsCompat = activityOptionsCompat;
-            super.activity = activity;
-            super.intent = intent;
+        private JumpBundle(ActivityOptionsCompat activityOptionsCompat, Activity activity, Intent intent, @NonNull Bundle bundle) {
+            super(activityOptionsCompat, activity, intent);
             this.bundle = bundle;
         }
 
@@ -612,18 +597,12 @@ public final class ActivityJump {
          * @return
          */
         public Builder bundleDone() {
-            return super.addBundle(bundle);
+            return addBundle(bundle);
         }
 
         @Override
         public JumpSceneTransition makeSceneTransitionAnimation() {
             return bundleDone().makeSceneTransitionAnimation();
-        }
-
-
-        @Override
-        public JumpSceneTransition makeSceneTransitionAnimation(Activity activity) {
-            return bundleDone().makeSceneTransitionAnimation(activity);
         }
     }
 }
