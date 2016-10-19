@@ -196,15 +196,36 @@ public final class ActivityJump {
             return this;
         }
 
+        /**
+         * 完成添加,用户不必主动调用
+         *
+         * @return
+         */
+        public Builder makeSceneTransitionDone() {
+            return builder.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
+        }
+
+        @Override
+        public JumpBundle createBundle() {
+            makeSceneTransitionDone();
+            return super.createBundle();
+        }
+
+        @Override
+        public JumpBundle createBundle(@NonNull Bundle bundle) {
+            makeSceneTransitionDone();
+            return super.createBundle(bundle);
+        }
+
         @Override
         public void jump() {
-            builder.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
+            makeSceneTransitionDone();
             super.jump();
         }
 
         @Override
         public void jumpForResult(int requestCode) {
-            builder.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
+            makeSceneTransitionDone();
             super.jumpForResult(requestCode);
         }
     }
@@ -598,15 +619,36 @@ public final class ActivityJump {
             return this;
         }
 
+        /**
+         * bundle操作完成,用户不必主动调用
+         *
+         * @return
+         */
+        public Builder bundleDone() {
+            return builder.addBundle(bundle);
+        }
+
+        @Override
+        public JumpSceneTransition makeSceneTransitionAnimation() {
+            bundleDone();
+            return super.makeSceneTransitionAnimation();
+        }
+
+        @Override
+        public JumpSceneTransition makeSceneTransitionAnimation(Activity activity) {
+            bundleDone();
+            return super.makeSceneTransitionAnimation(activity);
+        }
+
         @Override
         public void jump() {
-            builder.addBundle(bundle);
+            bundleDone();
             super.jump();
         }
 
         @Override
         public void jumpForResult(int requestCode) {
-            builder.addBundle(bundle);
+            bundleDone();
             super.jumpForResult(requestCode);
         }
     }
