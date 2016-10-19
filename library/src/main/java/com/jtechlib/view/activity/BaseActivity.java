@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.jtechlib.view.widget.ToolbarChain;
+import com.jtechlib.Util.ToolbarChain;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
@@ -67,7 +67,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     public ToolbarChain setupToolbar(Toolbar toolbar) {
         setSupportActionBar(toolbar);
-        return new ToolbarChain(getActivity(), toolbar);
+        return ToolbarChain.build(getActivity(), toolbar);
     }
 
     /**

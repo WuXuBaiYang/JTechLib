@@ -1,4 +1,4 @@
-package com.jtechlib.view.widget;
+package com.jtechlib.Util;
 
 import android.content.Context;
 import android.support.annotation.MenuRes;
@@ -10,13 +10,20 @@ import android.view.View;
 /**
  * toolbar的链式调用方法
  */
-public class ToolbarChain {
+public final class ToolbarChain {
     private Context context;
     private Toolbar toolbar;
 
-    public ToolbarChain(Context context, Toolbar toolbar) {
+    private ToolbarChain() {
+    }
+
+    private ToolbarChain(Context context, Toolbar toolbar) {
         this.context = context;
         this.toolbar = toolbar;
+    }
+
+    public static ToolbarChain build(Context context, Toolbar toolbar) {
+        return new ToolbarChain(context, toolbar);
     }
 
     public ToolbarChain setTitle(@StringRes int resId) {
