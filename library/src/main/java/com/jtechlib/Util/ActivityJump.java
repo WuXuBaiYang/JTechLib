@@ -167,16 +167,15 @@ public final class ActivityJump {
      * 页面跳转的元素动画构造器
      */
     public final static class JumpSceneTransition extends Builder {
-        private Activity activity;
         private List<Pair> pairs;
 
         private JumpSceneTransition() {
         }
 
         private JumpSceneTransition(@NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
-            this.activityOptionsCompat = activityOptionsCompat;
-            this.activity = activity;
-            this.intent = intent;
+            super.activityOptionsCompat = activityOptionsCompat;
+            super.activity = activity;
+            super.intent = intent;
             //实例化pair集合
             pairs = new ArrayList<>();
         }
@@ -222,17 +221,17 @@ public final class ActivityJump {
         private Bundle bundle;
 
         private JumpBundle(@NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
-            this.activityOptionsCompat = activityOptionsCompat;
-            this.activity = activity;
-            this.intent = intent;
+            super.activityOptionsCompat = activityOptionsCompat;
+            super.activity = activity;
+            super.intent = intent;
             //实例化一个bundle
             bundle = new Bundle();
         }
 
         private JumpBundle(@NonNull Bundle bundle, @NonNull Activity activity, @NonNull ActivityOptionsCompat activityOptionsCompat, @NonNull Intent intent) {
-            this.activityOptionsCompat = activityOptionsCompat;
-            this.activity = activity;
-            this.intent = intent;
+            super.activityOptionsCompat = activityOptionsCompat;
+            super.activity = activity;
+            super.intent = intent;
             this.bundle = bundle;
         }
 
