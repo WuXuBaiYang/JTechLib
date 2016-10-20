@@ -71,6 +71,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     /**
+     * 页面跳转
+     *
+     * @param clazz
+     * @return
+     */
+    public ActivityJump.Builder jumpTo(Class<?> clazz) {
+        return ActivityJump.build(getActivity(), clazz);
+    }
+
+    /**
      * 获取activity对象
      *
      * @return
