@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.jtechlib.Util.ActivityJump;
 import com.jtechlib.Util.ToolbarChain;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
@@ -69,16 +68,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public ToolbarChain setupToolbar(Toolbar toolbar) {
         setSupportActionBar(toolbar);
         return ToolbarChain.build(getActivity(), toolbar);
-    }
-
-    /**
-     * 页面跳转
-     *
-     * @param clazz
-     * @return
-     */
-    public ActivityJump.Builder jumpTo(Class<?> clazz) {
-        return ActivityJump.build(getActivity(), clazz);
     }
 
     /**
