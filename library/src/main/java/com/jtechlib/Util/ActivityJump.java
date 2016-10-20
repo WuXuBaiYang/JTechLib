@@ -1,4 +1,4 @@
-package com.jtechlib.view.activity;
+package com.jtechlib.Util;
 
 import android.app.Activity;
 import android.content.Intent;
