@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
 import com.jakewharton.rxbinding.view.RxView;
-import com.jtechlib.view.activity.ActivityJump;
 import com.jtechlib.view.activity.BaseActivity;
 
 import butterknife.Bind;
@@ -33,10 +32,7 @@ public class TestActivity extends BaseActivity {
         RxView.clicks(fab).subscribe(new Action1<Void>() {
             @Override
             public void call(Void aVoid) {
-                ActivityJump
-                        .build(getActivity(), TestActivity2.class)
-                        .createBundle()
-                        .putString("key", "15345")
+                jumpTo(TestActivity2.class)
                         .makeSceneTransitionAnimation()
                         .addPairs(fab, "fab")
                         .jump();

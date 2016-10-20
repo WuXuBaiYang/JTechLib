@@ -136,6 +136,10 @@ public class ActivityJump {
             return this;
         }
 
+        protected Builder getBuilder() {
+            return builder;
+        }
+
         public JumpBundle createBundle() {
             return new JumpBundle(null, builder);
         }
@@ -170,23 +174,16 @@ public class ActivityJump {
             return this;
         }
 
-        /**
-         * 一次性将全部的pairs都加入到场景转换的动画中
-         */
-        private void putAllPairs() {
-            super.builder.makeSceneTransitionAnimation(pairs.toArray(new Pair[pairs.size()]));
-        }
-
         @Override
         public void jump() {
-            putAllPairs();
-            super.jump();
+            getBuilder().makeSceneTransitionAnimation(pairs.toArray(new Pair[pairs.size()]));
+            getBuilder().jump();
         }
 
         @Override
         public void jumpForResult(int requestCode) {
-            putAllPairs();
-            super.jumpForResult(requestCode);
+            getBuilder().makeSceneTransitionAnimation(pairs.toArray(new Pair[pairs.size()]));
+            getBuilder().jumpForResult(requestCode);
         }
     }
 
