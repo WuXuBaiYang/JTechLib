@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.jtechlib.Util.ActivityJump;
 import com.jtechlib.Util.ToolbarChain;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
