@@ -71,16 +71,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 跳转到指定的activity
-     *
-     * @param clazz
-     * @return
-     */
-    public ActivityJump.Builder jumpTo(Class<?> clazz) {
-        return ActivityJump.build(getActivity(), clazz);
-    }
-
-    /**
      * 获取activity对象
      *
      * @return
