@@ -25,6 +25,5 @@ public class TestActivity extends BaseActivity {
     @Override
     protected void loadData() {
         //请求数据
-
     }
 }
