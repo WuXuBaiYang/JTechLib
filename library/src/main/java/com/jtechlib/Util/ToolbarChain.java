@@ -14,9 +14,6 @@ public final class ToolbarChain {
     private Context context;
     private Toolbar toolbar;
 
-    private ToolbarChain() {
-    }
-
     private ToolbarChain(Context context, Toolbar toolbar) {
         this.context = context;
         this.toolbar = toolbar;
