@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.jtechlib.Util.ToolbarChain;
+import com.jtechlib.view.fragment.BaseFragment;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
@@ -20,9 +21,13 @@ import butterknife.ButterKnife;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
+    public static String TAG = BaseFragment.class.getSimpleName();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //赋值TAG
+        TAG = this.getClass().getSimpleName();
         //将当前activity添加到activity管理中
         ActivityManager.getInstance().addActivity(this);
         //初始化变量(用户传递进来的参数)

@@ -20,12 +20,15 @@ import butterknife.ButterKnife;
  */
 public abstract class BaseFragment extends Fragment {
 
+    public static String TAG = BaseFragment.class.getSimpleName();
     private View contentView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (null == contentView) {
+            //赋值TAG
+            TAG = this.getClass().getSimpleName();
             //创建视图
             contentView = createView(inflater, container);
             //绑定注解框架
