@@ -103,6 +103,18 @@ public class ImageUtils {
      *
      * @param context
      * @param uri
+     * @param action
+     * @param action1
+     */
+    public static void requestImage(Context context, String uri, Action1<? super Bitmap> action, Action1<Throwable> action1) {
+        requestImage(context, uri, action, action1);
+    }
+
+    /**
+     * 请求图片
+     *
+     * @param context
+     * @param uri
      * @param width
      * @param height
      * @param action
