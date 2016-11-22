@@ -169,7 +169,6 @@ public class ImageUtils {
             int x = (toTransform.getWidth() - size) / 2;
             int y = (toTransform.getHeight() - size) / 2;
 
-            // TODO this could be acquired from the pool too
             Bitmap squared = Bitmap.createBitmap(toTransform, x, y, size, size);
 
             Bitmap result = pool.get(size, size, Bitmap.Config.ARGB_8888);
