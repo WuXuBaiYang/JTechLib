@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.request.target.Target;
 import com.jtechlib.model.BaseModel;
 
 import java.io.File;
@@ -95,19 +96,7 @@ public class ImageUtils {
      * @param action1
      */
     public static void requestImage(Context context, String uri, Action1<? super Bitmap> action1) {
-        requestImage(context, uri, action1);
-    }
-
-    /**
-     * 请求图片
-     *
-     * @param context
-     * @param uri
-     * @param action
-     * @param action1
-     */
-    public static void requestImage(Context context, String uri, Action1<? super Bitmap> action, Action1<Throwable> action1) {
-        requestImage(context, uri, action, action1);
+        requestImage(context, uri, Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL, action1);
     }
 
     /**
@@ -160,6 +149,21 @@ public class ImageUtils {
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(action, action1);
+    }
+
+    /**
+     * 图片请求，target返回
+     *
+     * @param context
+     * @param uri
+     * @param target
+     * @param <Y>
+     * @return
+     */
+    public static <Y extends Target<File>> Y requestImage(Context context, String uri, Y target) {
+        return Glide.with(context)
+                .load(uri)
+                .downloadOnly(target);
     }
 
     /**
