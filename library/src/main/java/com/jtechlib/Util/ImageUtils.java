@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
-import com.bumptech.glide.request.target.Target;
+import com.jtechlib.model.BaseModel;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -92,10 +92,23 @@ public class ImageUtils {
      *
      * @param context
      * @param uri
+     * @param action1
+     */
+    public static void requestImage(Context context, String uri, Action1<? super Bitmap> action1) {
+        requestImage(context, uri, action1);
+    }
+
+    /**
+     * 请求图片
+     *
+     * @param context
+     * @param uri
+     * @param width
+     * @param height
      * @param action
      */
-    public static void requestImage(final Context context, String uri, Action1<? super Bitmap> action) {
-        requestImage(context, uri, action, new Action1<Throwable>() {
+    public static void requestImage(Context context, String uri, int width, int height, Action1<? super Bitmap> action) {
+        requestImage(context, uri, width, height, action, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
                 Log.e("ImageLoadError", throwable.getMessage());
@@ -109,17 +122,17 @@ public class ImageUtils {
      * @param context
      * @param uri
      */
-    public static void requestImage(final Context context, String uri, Action1<? super Bitmap> action, Action1<Throwable> action1) {
-        Observable.just(uri)
+    public static void requestImage(Context context, String uri, int width, int height, Action1<? super Bitmap> action, Action1<Throwable> action1) {
+        Observable.just(new RxModel(context, uri, width, height))
                 .subscribeOn(Schedulers.io())
-                .map(new Func1<String, Bitmap>() {
+                .map(new Func1<RxModel, Bitmap>() {
                     @Override
-                    public Bitmap call(String uri) {
-                        if (!TextUtils.isEmpty(uri)) {
+                    public Bitmap call(RxModel rxModel1) {
+                        if (!TextUtils.isEmpty(rxModel1.getUri())) {
                             try {
-                                File file = Glide.with(context)
-                                        .load(uri)
-                                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                File file = Glide.with(rxModel1.getContext())
+                                        .load(rxModel1.getUri())
+                                        .downloadOnly(rxModel1.getWidth(), rxModel1.getHeight())
                                         .get();
                                 if (null != file && !TextUtils.isEmpty(file.getAbsolutePath())) {
                                     return BitmapFactory.decodeFile(file.getAbsolutePath());
@@ -176,6 +189,55 @@ public class ImageUtils {
         @Override
         public String getId() {
             return getClass().getName();
+        }
+    }
+
+    /**
+     * 图片对象
+     */
+    private static class RxModel extends BaseModel {
+        private Context context;
+        private String uri;
+        private int width;
+        private int height;
+
+        public RxModel(Context context, String uri, int width, int height) {
+            this.context = context;
+            this.uri = uri;
+            this.width = width;
+            this.height = height;
+        }
+
+        public String getUri() {
+            return uri;
+        }
+
+        public void setUri(String uri) {
+            this.uri = uri;
+        }
+
+        public Context getContext() {
+            return context;
+        }
+
+        public void setContext(Context context) {
+            this.context = context;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
         }
     }
 }
