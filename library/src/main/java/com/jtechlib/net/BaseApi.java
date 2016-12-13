@@ -1,11 +1,5 @@
 package com.jtechlib.net;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.DateTypeAdapter;
-
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,21 +9,12 @@ import retrofit2.CallAdapter;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * api基类
  * Created by jianghan on 2016/9/19.
  */
 public class BaseApi {
-    /**
-     * gson对象,通用
-     */
-    public static Gson gson = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .registerTypeAdapter(Date.class, new DateTypeAdapter())
-            .create();
-
     /**
      * 创建一个接口方法
      *
@@ -41,7 +26,7 @@ public class BaseApi {
      * @param <T>
      * @return
      */
-    public <T> T createApi(OkHttpClient okHttpClient, Converter.Factory converterFactory, CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
+    public <T> T create(OkHttpClient okHttpClient, Converter.Factory converterFactory, CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
         Retrofit.Builder builder = new Retrofit.Builder()
                 //基础url
                 .baseUrl(baseUrl)
@@ -61,99 +46,47 @@ public class BaseApi {
         return retrofit.create(service);
     }
 
-    /**
-     * 创建一个接口方法
-     *
-     * @param okHttpClient
-     * @param callAdapterFactory
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
-    public <T> T createApi(OkHttpClient okHttpClient, CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
-        return createApi(okHttpClient, GsonConverterFactory.create(gson), callAdapterFactory, baseUrl, service);
+    public <T> T createApi(Interceptor interceptor, Converter.Factory converterFactory, CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
+        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        if (null != interceptor) {
+            builder.addInterceptor(interceptor);
+        }
+        return create(builder.build(), converterFactory, callAdapterFactory, baseUrl, service);
     }
 
-    /**
-     * 创建一个接口方法
-     *
-     * @param interceptor
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
-    public <T> T createApi(Interceptor interceptor, String baseUrl, Class<T> service) {
-        OkHttpClient okHttpClient = new OkHttpClient()
-                .newBuilder()
-                .addInterceptor(interceptor)
-                .build();
-        return createApi(okHttpClient, GsonConverterFactory.create(gson), null, baseUrl, service);
+    public <T> T createApi(Map<String, String> headerMap, Converter.Factory converterFactory, CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
+        return createApi(new CommonInterceptor(headerMap), converterFactory, callAdapterFactory, baseUrl, service);
     }
 
-    /**
-     * 创建一个接口方法
-     *
-     * @param headerMap
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
-    public <T> T createApi(Map<String, String> headerMap, String baseUrl, Class<T> service) {
-        return createApi(new CommonInterceptor(headerMap), baseUrl, service);
+    public <T> T createApi(Converter.Factory converterFactory, CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
+        return createApi(new HashMap<String, String>(), converterFactory, callAdapterFactory, baseUrl, service);
     }
 
-    /**
-     * 创建一个接口方法
-     *
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
+    public <T> T createApi(CallAdapter.Factory callAdapterFactory, String baseUrl, Class<T> service) {
+        return createApi(null, callAdapterFactory, baseUrl, service);
+    }
+
     public <T> T createApi(String baseUrl, Class<T> service) {
-        return createApi(new CommonInterceptor(new HashMap<String, String>()), baseUrl, service);
+        return createApi(null, baseUrl, service);
     }
 
-    /**
-     * 创建一个接口方法
-     *
-     * @param interceptor
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
-    public <T> T createRxApi(Interceptor interceptor, String baseUrl, Class<T> service) {
-        OkHttpClient okHttpClient = new OkHttpClient()
-                .newBuilder()
-                .addInterceptor(interceptor)
-                .build();
-        return createApi(okHttpClient, RxJavaCallAdapterFactory.create(), baseUrl, service);
+    public <T> T createRxApi(Interceptor interceptor, Converter.Factory converterFactory, String baseUrl, Class<T> service) {
+        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        if (null != interceptor) {
+            builder.addInterceptor(interceptor);
+        }
+        return create(builder.build(), converterFactory, RxJavaCallAdapterFactory.create(), baseUrl, service);
     }
 
-    /**
-     * @param headerMap
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
-    public <T> T createRxApi(Map<String, String> headerMap, String baseUrl, Class<T> service) {
-        return createRxApi(new CommonInterceptor(headerMap), baseUrl, service);
+    public <T> T createRxApi(Map<String, String> headerMap, Converter.Factory converterFactory, String baseUrl, Class<T> service) {
+        return createRxApi(new CommonInterceptor(headerMap), converterFactory, baseUrl, service);
     }
 
-    /**
-     * 创建一个接口方法
-     *
-     * @param baseUrl
-     * @param service
-     * @param <T>
-     * @return
-     */
+    public <T> T createRxApi(Converter.Factory converterFactory, String baseUrl, Class<T> service) {
+        return createRxApi(new HashMap<String, String>(), converterFactory, baseUrl, service);
+    }
+
     public <T> T createRxApi(String baseUrl, Class<T> service) {
-        return createRxApi(new CommonInterceptor(new HashMap<String, String>()), baseUrl, service);
+        return createRxApi(null, baseUrl, service);
     }
 }
