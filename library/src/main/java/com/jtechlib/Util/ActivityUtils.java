@@ -32,7 +32,7 @@ public class ActivityUtils {
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
      * performed by the {@code fragmentManager}.
      */
-    public static void addFragmentToActivity(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment, int frameId) {
+    public static <T extends Fragment> void addFragmentToActivity(@NonNull FragmentManager fragmentManager, @NonNull T fragment, int frameId) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment);
         transaction.commit();
@@ -45,7 +45,7 @@ public class ActivityUtils {
      * @param fragments
      * @param frameId
      */
-    public static void addFragmentListToActivity(@NonNull FragmentManager fragmentManager, @NonNull List<Fragment> fragments, int frameId) {
+    public static void addFragmentListToActivity(@NonNull FragmentManager fragmentManager, @NonNull List<? extends Fragment> fragments, int frameId) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         for (int i = 0; i < fragments.size(); i++) {
             transaction.add(frameId, fragments.get(i));
@@ -59,7 +59,7 @@ public class ActivityUtils {
      * @param fragmentManager
      * @param fragment
      */
-    public static void showFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
+    public static <T extends Fragment> void showFragment(@NonNull FragmentManager fragmentManager, @NonNull T fragment) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.show(fragment);
         transaction.commit();
@@ -71,7 +71,7 @@ public class ActivityUtils {
      * @param fragmentManager
      * @param fragment
      */
-    public static void hideFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
+    public static <T extends Fragment> void hideFragment(@NonNull FragmentManager fragmentManager, @NonNull T fragment) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.hide(fragment);
         transaction.commit();
@@ -84,7 +84,7 @@ public class ActivityUtils {
      * @param fragments
      * @param index
      */
-    public static void selectFragment(@NonNull FragmentManager fragmentManager, @NonNull List<Fragment> fragments, int index) {
+    public static void selectFragment(@NonNull FragmentManager fragmentManager, @NonNull List<? extends Fragment> fragments, int index) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         for (int i = 0; i < fragments.size(); i++) {
             if (index == i) {
