@@ -1,7 +1,6 @@
 package com.jtech.test;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 
 import com.jtechlib.view.activity.BaseActivity;
 

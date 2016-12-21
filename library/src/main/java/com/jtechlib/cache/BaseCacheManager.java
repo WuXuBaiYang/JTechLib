@@ -94,7 +94,7 @@ public abstract class BaseCacheManager {
         } else if (value instanceof Float || "float".equals(clazzType)) {//是否为float或者float封装类型
             return insertFloat(key, (Float) value);
         } else if (value instanceof Long || "long".equals(clazzType)) {//是否为long或者long封装类型
-            return instertLong(key, (Long) value);
+            return insertLong(key, (Long) value);
         } else if (value instanceof Serializable) {//实现了序列化接口
             insertSerializable(key, (Serializable) value, saveTime);
         } else {
@@ -255,7 +255,7 @@ public abstract class BaseCacheManager {
      * @param value
      * @return
      */
-    public boolean instertLong(String key, long value) {
+    public boolean insertLong(String key, long value) {
         return getSharedPreferences()
                 .edit()
                 .putLong(key, value)
