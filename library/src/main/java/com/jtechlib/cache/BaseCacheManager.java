@@ -6,13 +6,13 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.jakewharton.rxbinding.internal.Preconditions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -335,11 +335,10 @@ public abstract class BaseCacheManager {
      * @param <D>
      * @return
      */
-    public <D> List<D> getList(@NonNull String key) {
+    public <D> List<D> getList(@NonNull String key, Type typeOfT) {
         String json = getACache().getAsString(key);
         if (!TextUtils.isEmpty(json)) {
-            return getGson().fromJson(json, new TypeToken<List<D>>() {
-            }.getType());
+            return getGson().fromJson(json, typeOfT);
         }
         return null;
     }
