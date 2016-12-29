@@ -3,13 +3,17 @@ package com.jtechlib.cache;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jakewharton.rxbinding.internal.Preconditions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 缓存管理基类
@@ -17,10 +21,10 @@ import java.io.Serializable;
  */
 public abstract class BaseCacheManager {
 
-    private Context context;
-
     private int mode;
+    private Gson gson;
     private ACache aCache;
+    private Context context;
     private SharedPreferences sharedPreferences;
 
     public BaseCacheManager(Context context) {
@@ -59,48 +63,19 @@ public abstract class BaseCacheManager {
     }
 
     /**
-     * 插入数据
+     * 懒加载Gson对象
      *
-     * @param key
-     * @param value
      * @return
      */
-    public boolean insert(@NonNull String key, @NonNull Object value) {
-        return insert(key, value, -1);
-    }
-
-    /**
-     * 插入数据
-     *
-     * @param key      存储Key
-     * @param value    类型限制：byte[]/String/serializable/jsonobject/jsonarray
-     * @param saveTime 存储时间，单位（秒）
-     * @return 是否插入成功
-     */
-    public boolean insert(@NonNull String key, @NonNull Object value, int saveTime) {
-        String clazzType = value.getClass().getName();
-        if (value instanceof Byte[]) {//为byte[]类型
-            insertByte(key, (Byte[]) value, saveTime);
-        } else if (value instanceof String) {//为String类型
-            insertString(key, (String) value, saveTime);
-        } else if (value instanceof JSONObject) {//jsonobject对象
-            insertJsonObject(key, (JSONObject) value, saveTime);
-        } else if (value instanceof JSONArray) {//jsonarray对象
-            insertJsonArray(key, (JSONArray) value, saveTime);
-        } else if (value instanceof Integer || "int".equals(clazzType)) {//是否为int或者int封装类型
-            return insertInt(key, (Integer) value);
-        } else if (value instanceof Boolean || "boolean".equals(clazzType)) {//是否为boolean或者boolean封装类型
-            return insertBoolean(key, (Boolean) value);
-        } else if (value instanceof Float || "float".equals(clazzType)) {//是否为float或者float封装类型
-            return insertFloat(key, (Float) value);
-        } else if (value instanceof Long || "long".equals(clazzType)) {//是否为long或者long封装类型
-            return insertLong(key, (Long) value);
-        } else if (value instanceof Serializable) {//实现了序列化接口
-            insertSerializable(key, (Serializable) value, saveTime);
-        } else {
-            return false;
+    private Gson getGson() {
+        Preconditions.checkNotNull(context, "请实例化context构造");
+        if (null == gson) {//首次获取gson
+            this.gson = getCustomizeGson();
+            if (null == gson) {//为空则创建默认gson
+                this.gson = new Gson();
+            }
         }
-        return true;
+        return gson;
     }
 
     /**
@@ -109,8 +84,8 @@ public abstract class BaseCacheManager {
      * @param key
      * @param value
      */
-    public void insertByte(String key, Byte[] value, int saveTime) {
-        getACache().put(key, value, saveTime);
+    public void put(String key, Byte[] value) {
+        put(key, value, -1);
     }
 
     /**
@@ -119,17 +94,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @param value
      */
-    public void insertByte(String key, Byte[] value) {
-        insertByte(key, value, -1);
-    }
-
-    /**
-     * 插入string类型
-     *
-     * @param key
-     * @param value
-     */
-    public void insertString(String key, String value, int saveTime) {
+    public void put(String key, Byte[] value, int saveTime) {
         getACache().put(key, value, saveTime);
     }
 
@@ -139,8 +104,18 @@ public abstract class BaseCacheManager {
      * @param key
      * @param value
      */
-    public void insertString(String key, String value) {
-        insertString(key, value, -1);
+    public void put(String key, String value) {
+        put(key, value, -1);
+    }
+
+    /**
+     * 插入string类型
+     *
+     * @param key
+     * @param value
+     */
+    public void put(String key, String value, int saveTime) {
+        getACache().put(key, value, saveTime);
     }
 
     /**
@@ -150,10 +125,9 @@ public abstract class BaseCacheManager {
      * @param value
      * @param <D>
      */
-    public <D extends Serializable> void insertSerializable(String key, D value, int saveTime) {
-        getACache().put(key, value, saveTime);
+    public <D extends Serializable> void put(String key, D value) {
+        put(key, value, -1);
     }
-
 
     /**
      * 插入实现了serializable接口的对象
@@ -162,17 +136,7 @@ public abstract class BaseCacheManager {
      * @param value
      * @param <D>
      */
-    public <D extends Serializable> void insertSerializable(String key, D value) {
-        getACache().put(key, value, -1);
-    }
-
-    /**
-     * 插入jsonobject对象
-     *
-     * @param key
-     * @param value
-     */
-    public void insertJsonObject(String key, JSONObject value, int saveTime) {
+    public <D extends Serializable> void put(String key, D value, int saveTime) {
         getACache().put(key, value, saveTime);
     }
 
@@ -182,17 +146,17 @@ public abstract class BaseCacheManager {
      * @param key
      * @param value
      */
-    public void insertJsonObject(String key, JSONObject value) {
-        getACache().put(key, value, -1);
+    public void put(String key, JSONObject value) {
+        put(key, value, -1);
     }
 
     /**
-     * 插入jsonarray对象
+     * 插入jsonobject对象
      *
      * @param key
      * @param value
      */
-    public void insertJsonArray(String key, JSONArray value, int saveTime) {
+    public void put(String key, JSONObject value, int saveTime) {
         getACache().put(key, value, saveTime);
     }
 
@@ -202,8 +166,47 @@ public abstract class BaseCacheManager {
      * @param key
      * @param value
      */
-    public void insertJsonArray(String key, JSONArray value) {
-        getACache().put(key, value, -1);
+    public void put(String key, JSONArray value) {
+        put(key, value, -1);
+    }
+
+    /**
+     * 插入jsonarray对象
+     *
+     * @param key
+     * @param value
+     */
+    public void put(String key, JSONArray value, int saveTime) {
+        getACache().put(key, value, saveTime);
+    }
+
+    /**
+     * 插入一个集合
+     *
+     * @param key
+     * @param values
+     * @param <D>
+     * @return
+     */
+    public <D> boolean put(String key, List<D> values) {
+        return put(key, values, -1);
+    }
+
+    /**
+     * 插入一个集合,使用gson解析为jsonarray进行存储，可能会出现很多对象不兼容的问题
+     *
+     * @param key
+     * @param values
+     * @param saveTime
+     * @param <D>
+     * @return
+     */
+    public <D> boolean put(String key, List<D> values, int saveTime) {
+        String json = getGson().toJson(values);
+        if (!TextUtils.isEmpty(json)) {
+            getACache().put(key, json, saveTime);
+        }
+        return false;
     }
 
     /**
@@ -213,7 +216,7 @@ public abstract class BaseCacheManager {
      * @param value
      * @return
      */
-    public boolean insertInt(String key, int value) {
+    public boolean put(String key, int value) {
         return getSharedPreferences()
                 .edit()
                 .putInt(key, value)
@@ -227,7 +230,7 @@ public abstract class BaseCacheManager {
      * @param value
      * @return
      */
-    public boolean insertBoolean(String key, boolean value) {
+    public boolean put(String key, boolean value) {
         return getSharedPreferences()
                 .edit()
                 .putBoolean(key, value)
@@ -241,7 +244,7 @@ public abstract class BaseCacheManager {
      * @param value
      * @return
      */
-    public boolean insertFloat(String key, float value) {
+    public boolean put(String key, float value) {
         return getSharedPreferences()
                 .edit()
                 .putFloat(key, value)
@@ -255,7 +258,7 @@ public abstract class BaseCacheManager {
      * @param value
      * @return
      */
-    public boolean insertLong(String key, long value) {
+    public boolean put(String key, long value) {
         return getSharedPreferences()
                 .edit()
                 .putLong(key, value)
@@ -263,39 +266,16 @@ public abstract class BaseCacheManager {
     }
 
     /**
-     * 删除文件
+     * 根据key删除文件
      *
      * @param key
      * @return
      */
-    public boolean delete(@NonNull String key) {
+    public boolean deleteByKey(@NonNull String key) {
         return getACache().remove(key) || getSharedPreferences()
                 .edit()
                 .remove(key)
                 .commit();
-    }
-
-    /**
-     * 更新数据
-     *
-     * @param key
-     * @param newValue
-     * @return
-     */
-    public boolean update(@NonNull String key, @NonNull Object newValue) {
-        return update(key, newValue, -1);
-    }
-
-    /**
-     * 更新数据
-     *
-     * @param key
-     * @param newValue
-     * @param saveTime
-     * @return
-     */
-    public boolean update(@NonNull String key, @NonNull Object newValue, int saveTime) {
-        return insert(key, newValue, saveTime);
     }
 
     /**
@@ -304,7 +284,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public byte[] queryBinary(@NonNull String key) {
+    public byte[] getBinary(@NonNull String key) {
         return getACache().getAsBinary(key);
     }
 
@@ -314,7 +294,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public String queryString(@NonNull String key) {
+    public String getString(@NonNull String key) {
         return getACache().getAsString(key);
     }
 
@@ -324,7 +304,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public <R> R querySerializable(@NonNull String key) {
+    public <R extends Serializable> R getSerializable(@NonNull String key) {
         return (R) getACache().getAsObject(key);
     }
 
@@ -334,7 +314,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public JSONObject queryJsonObject(@NonNull String key) {
+    public JSONObject getJsonObject(@NonNull String key) {
         return getACache().getAsJSONObject(key);
     }
 
@@ -344,8 +324,24 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public JSONArray queryJsonArray(@NonNull String key) {
+    public JSONArray getJsonArray(@NonNull String key) {
         return getACache().getAsJSONArray(key);
+    }
+
+    /**
+     * 获取一个集合
+     *
+     * @param key
+     * @param <D>
+     * @return
+     */
+    public <D> List<D> getList(@NonNull String key) {
+        String json = getACache().getAsString(key);
+        if (!TextUtils.isEmpty(json)) {
+            return getGson().fromJson(json, new TypeToken<List<D>>() {
+            }.getType());
+        }
+        return null;
     }
 
     /**
@@ -354,7 +350,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public int queryInt(@NonNull String key, int defValut) {
+    public int getInt(@NonNull String key, int defValut) {
         return getSharedPreferences().getInt(key, defValut);
     }
 
@@ -364,7 +360,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public boolean queryBoolean(@NonNull String key, boolean defValue) {
+    public boolean getBoolean(@NonNull String key, boolean defValue) {
         return getSharedPreferences().getBoolean(key, defValue);
     }
 
@@ -374,7 +370,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public float queryFloat(@NonNull String key, float defValue) {
+    public float getFloat(@NonNull String key, float defValue) {
         return getSharedPreferences().getFloat(key, defValue);
     }
 
@@ -384,7 +380,7 @@ public abstract class BaseCacheManager {
      * @param key
      * @return
      */
-    public long queryLong(@NonNull String key, long defVlaue) {
+    public long getLong(@NonNull String key, long defVlaue) {
         return getSharedPreferences().getLong(key, defVlaue);
     }
 
@@ -394,4 +390,13 @@ public abstract class BaseCacheManager {
      * @return
      */
     public abstract String getCacheName();
+
+    /**
+     * 获取定制gson,使用者可以重写,不为空则会使用当前返回
+     *
+     * @return
+     */
+    public Gson getCustomizeGson() {
+        return new Gson();
+    }
 }
