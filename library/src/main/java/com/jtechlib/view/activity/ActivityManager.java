@@ -81,11 +81,11 @@ public class ActivityManager {
      * @param c
      * @return
      */
-    public <T extends Activity> T getActivity(Class c) {
+    public Activity getActivity(Class c) {
         if (null != activities) {
             for (Activity activity : activities) {
                 if (activity.getClass() == c) {
-                    return (T) activity;
+                    return activity;
                 }
             }
         }
