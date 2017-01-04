@@ -29,7 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         //赋值TAG
         TAG = this.getClass().getSimpleName();
         //将当前activity添加到activity管理中
-        ActivityManager.getInstance().addActivity(this);
+        ActivityManager.get().addActivity(this);
         //初始化变量(用户传递进来的参数)
         initVariables(getBundle());
         //初始化视图
@@ -121,6 +121,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         //移除当前activity对象
-        ActivityManager.getInstance().removeActivity(this);
+        ActivityManager.get().removeActivity(this);
     }
 }

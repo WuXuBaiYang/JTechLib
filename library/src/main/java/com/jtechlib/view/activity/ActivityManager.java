@@ -18,7 +18,7 @@ public class ActivityManager {
         activities = new ArrayList<>();
     }
 
-    public static ActivityManager getInstance() {
+    public static ActivityManager get() {
         if (null == activityManager) {
             activityManager = new ActivityManager();
         }
@@ -73,5 +73,22 @@ public class ActivityManager {
             }
         }
         return false;
+    }
+
+    /**
+     * 根据类型获取一个activity
+     *
+     * @param c
+     * @return
+     */
+    public <T extends Activity> T getActivity(Class c) {
+        if (null != activities) {
+            for (Activity activity : activities) {
+                if (activity.getClass() == c) {
+                    return (T) activity;
+                }
+            }
+        }
+        return null;
     }
 }
