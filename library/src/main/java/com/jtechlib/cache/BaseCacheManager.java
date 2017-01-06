@@ -336,11 +336,8 @@ public abstract class BaseCacheManager {
      * @return
      */
     public <D> List<D> getList(@NonNull String key, Type typeOfT) {
-        String json = getACache().getAsString(key);
-        if (!TextUtils.isEmpty(json)) {
-            return getGson().fromJson(json, typeOfT);
-        }
-        return null;
+        JSONArray jsonArray = getJsonArray(key);
+        return getGson().fromJson(null != jsonArray ? jsonArray.toString() : "[]", typeOfT);
     }
 
     /**
