@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -205,11 +206,25 @@ public class ImageUtils {
                     public Bitmap call(RxModel rxModel1) {
                         if (!TextUtils.isEmpty(rxModel1.getUri())) {
                             BitmapFactory.Options options = new BitmapFactory.Options();
-                            if (Target.SIZE_ORIGINAL != rxModel1.getHeight()) {
-                                options.outHeight = rxModel1.getHeight();
+                            //以高为单位缩放
+                            if (ViewGroup.LayoutParams.WRAP_CONTENT == rxModel1.getWidth()) {
+                                options.inJustDecodeBounds = true;
+                                Bitmap bitmap = BitmapFactory.decodeFile(rxModel1.getUri(), options);
+                                if (null != bitmap) {
+                                    double ratio = (1.0 * rxModel1.getHeight()) / bitmap.getHeight();
+                                    options.outWidth = (int) (ratio * rxModel1.getWidth());
+                                    options.outHeight = rxModel1.getHeight();
+                                }
                             }
-                            if (Target.SIZE_ORIGINAL != rxModel1.getWidth()) {
-                                options.outWidth = rxModel1.getWidth();
+                            //以宽为单位缩放
+                            if (ViewGroup.LayoutParams.WRAP_CONTENT == rxModel1.getHeight()) {
+                                options.inJustDecodeBounds = true;
+                                Bitmap bitmap = BitmapFactory.decodeFile(rxModel1.getUri(), options);
+                                if (null != bitmap) {
+                                    double ratio = (1.0 * rxModel1.getWidth()) / bitmap.getWidth();
+                                    options.outHeight = (int) (ratio * rxModel1.getHeight());
+                                    options.outWidth = rxModel1.getWidth();
+                                }
                             }
                             return BitmapFactory.decodeFile(rxModel1.getUri(), options);
                         }
