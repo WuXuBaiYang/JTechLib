@@ -205,10 +205,10 @@ public class ImageUtils {
                     public Bitmap call(RxModel rxModel1) {
                         if (!TextUtils.isEmpty(rxModel1.getUri())) {
                             BitmapFactory.Options options = new BitmapFactory.Options();
-                            if (!rxModel1.isHeightOrigin()) {
+                            if (Target.SIZE_ORIGINAL != rxModel1.getHeight()) {
                                 options.outHeight = rxModel1.getHeight();
                             }
-                            if (!rxModel1.isWidthOrigin()) {
+                            if (Target.SIZE_ORIGINAL != rxModel1.getWidth()) {
                                 options.outWidth = rxModel1.getWidth();
                             }
                             return BitmapFactory.decodeFile(rxModel1.getUri(), options);
@@ -322,24 +322,6 @@ public class ImageUtils {
 
         public void setHeight(int height) {
             this.height = height;
-        }
-
-        /**
-         * 宽度是否为原始尺寸
-         *
-         * @return
-         */
-        public boolean isWidthOrigin() {
-            return width == Target.SIZE_ORIGINAL;
-        }
-
-        /**
-         * 高度是否为原始尺寸
-         *
-         * @return
-         */
-        public boolean isHeightOrigin() {
-            return width == Target.SIZE_ORIGINAL;
         }
     }
 }
