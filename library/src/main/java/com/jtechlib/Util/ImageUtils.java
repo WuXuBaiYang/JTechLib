@@ -206,6 +206,8 @@ public class ImageUtils {
                     public Bitmap call(RxModel rxModel1) {
                         if (!TextUtils.isEmpty(rxModel1.getUri())) {
                             BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.outWidth = rxModel1.getWidth() >= 0 ? rxModel1.getWidth() : 0;
+                            options.outHeight = rxModel1.getHeight() >= 0 ? rxModel1.getHeight() : 0;
                             //以高为单位缩放
                             if (ViewGroup.LayoutParams.WRAP_CONTENT == rxModel1.getWidth()) {
                                 options.inJustDecodeBounds = true;
