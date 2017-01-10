@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -206,28 +205,21 @@ public class ImageUtils {
                     public Bitmap call(RxModel rxModel1) {
                         if (!TextUtils.isEmpty(rxModel1.getUri())) {
                             BitmapFactory.Options options = new BitmapFactory.Options();
-                            options.outWidth = rxModel1.getWidth() >= 0 ? rxModel1.getWidth() : 0;
-                            options.outHeight = rxModel1.getHeight() >= 0 ? rxModel1.getHeight() : 0;
-                            //以高为单位缩放
-                            if (ViewGroup.LayoutParams.WRAP_CONTENT == rxModel1.getWidth()) {
-                                options.inJustDecodeBounds = true;
-                                Bitmap bitmap = BitmapFactory.decodeFile(rxModel1.getUri(), options);
-                                if (null != bitmap) {
-                                    double ratio = (1.0 * rxModel1.getHeight()) / bitmap.getHeight();
-                                    options.outWidth = (int) (ratio * rxModel1.getWidth());
-                                    options.outHeight = rxModel1.getHeight();
-                                }
+                            options.inJustDecodeBounds = true;
+                            BitmapFactory.decodeFile(rxModel1.getUri(), options);
+                            int targetWidth = rxModel1.getWidth();
+                            int targetHeight = rxModel1.getHeight();
+                            if (targetWidth == -1) {
+                                double ratio = (1.0 * rxModel1.getHeight()) / options.outHeight;
+                                targetWidth = (int) (ratio * options.outWidth);
+                            } else if (targetHeight == -1) {
+                                double ratio = (1.0 * rxModel1.getWidth()) / options.outWidth;
+                                targetHeight = (int) (ratio * options.outHeight);
                             }
-                            //以宽为单位缩放
-                            if (ViewGroup.LayoutParams.WRAP_CONTENT == rxModel1.getHeight()) {
-                                options.inJustDecodeBounds = true;
-                                Bitmap bitmap = BitmapFactory.decodeFile(rxModel1.getUri(), options);
-                                if (null != bitmap) {
-                                    double ratio = (1.0 * rxModel1.getWidth()) / bitmap.getWidth();
-                                    options.outHeight = (int) (ratio * rxModel1.getHeight());
-                                    options.outWidth = rxModel1.getWidth();
-                                }
-                            }
+                            options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
+                            options.outWidth = targetWidth;
+                            options.outHeight = targetHeight;
+                            options.inJustDecodeBounds = false;
                             return BitmapFactory.decodeFile(rxModel1.getUri(), options);
                         }
                         return null;
@@ -291,6 +283,28 @@ public class ImageUtils {
         public String getId() {
             return getClass().getName();
         }
+    }
+
+    /**
+     * 根据目标宽高计算samplesize
+     *
+     * @param options
+     * @param reqWidth
+     * @param reqHeight
+     * @return
+     */
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // 源图片的高度和宽度
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            // 计算出实际宽高和目标宽高的比率
+            final int heightRatio = Math.round((float) height / (float) reqHeight);
+            final int widthRatio = Math.round((float) width / (float) reqWidth);
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+        return inSampleSize;
     }
 
     /**
