@@ -119,9 +119,15 @@ public class ImageUtils {
 
     /**
      * 请求图片，回调bitmap
+     * 本地文件必须添加资源标识符{@link RxModel#URI_FILE}
+     * 网络文件必须添加资源标识符{@link RxModel#URI_HTTP}{@link RxModel#URI_HTTPS}
      *
      * @param context
      * @param uri
+     * @param width
+     * @param height
+     * @param action
+     * @param action1
      */
     public static void requestImage(Context context, String uri, int width, int height, Action1<? super Bitmap> action, Action1<Throwable> action1) {
         Observable.just(new RxModel(context, uri, width, height))
@@ -131,12 +137,24 @@ public class ImageUtils {
                     public Bitmap call(RxModel rxModel1) {
                         if (!TextUtils.isEmpty(rxModel1.getUri())) {
                             try {
-                                File file = Glide.with(rxModel1.getContext())
-                                        .load(rxModel1.getUri())
-                                        .downloadOnly(rxModel1.getWidth(), rxModel1.getHeight())
-                                        .get();
-                                if (null != file && !TextUtils.isEmpty(file.getAbsolutePath())) {
+                                //处理网络文件
+                                if (rxModel1.isHttp() || rxModel1.isHttps()) {
+                                    File file = Glide.with(rxModel1.getContext())
+                                            .load(rxModel1.getUri())
+                                            .downloadOnly(rxModel1.getWidth(), rxModel1.getHeight())
+                                            .get();
                                     return BitmapFactory.decodeFile(file.getAbsolutePath());
+                                }
+                                //处理本地文件
+                                if (rxModel1.isFile()) {
+                                    BitmapFactory.Options options = new BitmapFactory.Options();
+                                    if (!rxModel1.isHeightOrigin()) {
+                                        options.outHeight = rxModel1.getHeight();
+                                    }
+                                    if (!rxModel1.isWidthOrigin()) {
+                                        options.outWidth = rxModel1.getWidth();
+                                    }
+                                    return BitmapFactory.decodeFile(rxModel1.getUri(), options);
                                 }
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -211,6 +229,10 @@ public class ImageUtils {
      * 图片对象
      */
     private static class RxModel extends BaseModel {
+        public static final String URI_HTTP = "http://";
+        public static final String URI_HTTPS = "https://";
+        public static final String URI_FILE = "file://";
+
         private Context context;
         private String uri;
         private int width;
@@ -253,6 +275,51 @@ public class ImageUtils {
 
         public void setHeight(int height) {
             this.height = height;
+        }
+
+        /**
+         * 判断是否为http
+         *
+         * @return
+         */
+        public boolean isHttp() {
+            return getUri().startsWith(RxModel.URI_HTTP);
+        }
+
+        /**
+         * 是否为https
+         *
+         * @return
+         */
+        public boolean isHttps() {
+            return getUri().startsWith(RxModel.URI_HTTPS);
+        }
+
+        /**
+         * 是否为file
+         *
+         * @return
+         */
+        public boolean isFile() {
+            return getUri().startsWith(RxModel.URI_FILE);
+        }
+
+        /**
+         * 宽度是否为原始尺寸
+         *
+         * @return
+         */
+        public boolean isWidthOrigin() {
+            return width == Target.SIZE_ORIGINAL;
+        }
+
+        /**
+         * 高度是否为原始尺寸
+         *
+         * @return
+         */
+        public boolean isHeightOrigin() {
+            return width == Target.SIZE_ORIGINAL;
         }
     }
 }
