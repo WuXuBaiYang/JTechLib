@@ -28,13 +28,24 @@ public class JNotify {
     private static final int DEFAULT_VIBRATE_OFF = 100;
 
     /**
-     * 开始构造
+     * 构造
      *
      * @param context
      * @return
      */
     public static NotifyBuilder build(Context context) {
         return new NotifyBuilder(context);
+    }
+
+    /**
+     * 构造
+     *
+     * @param context
+     * @param builder
+     * @return
+     */
+    public static NotifyBuilder build(Context context, NotificationCompat.Builder builder) {
+        return new NotifyBuilder(context, builder);
     }
 
     /**
