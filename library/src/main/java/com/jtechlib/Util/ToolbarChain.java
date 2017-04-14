@@ -74,6 +74,11 @@ public final class ToolbarChain {
         return this;
     }
 
+    public ToolbarChain setNavigationClick(View.OnClickListener onClickListener) {
+        toolbar.setNavigationOnClickListener(onClickListener);
+        return this;
+    }
+
     public ToolbarChain inflateMenu(@MenuRes int resId) {
         toolbar.inflateMenu(resId);
         return this;

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -57,6 +58,37 @@ public class ImageUtils {
                 .error(errorResId)
                 .placeholder(placeholderResId)
                 .transform(new GlideCircleTransform(context))
+                .into(imageView);
+    }
+
+    /**
+     * @param context
+     * @param uri
+     * @param imageView
+     * @param radius
+     * @param <T>
+     */
+    public static <T extends ImageView> void showRoundImage(Context context, String uri, T imageView, float radius) {
+        showRoundImage(context, uri, imageView, radius, 0, 0);
+    }
+
+    /**
+     * 显示圆角图片
+     *
+     * @param context
+     * @param uri
+     * @param imageView
+     * @param radius
+     * @param errorResId
+     * @param placeholderResId
+     * @param <T>
+     */
+    public static <T extends ImageView> void showRoundImage(Context context, String uri, T imageView, float radius, int errorResId, int placeholderResId) {
+        Glide.with(context)
+                .load(uri)
+                .error(errorResId)
+                .placeholder(placeholderResId)
+                .transform(new GlideRoundTransform(context, radius))
                 .into(imageView);
     }
 
@@ -282,6 +314,45 @@ public class ImageUtils {
         @Override
         public String getId() {
             return getClass().getName();
+        }
+    }
+
+    /**
+     * 圆角图片
+     */
+    private static class GlideRoundTransform extends BitmapTransformation {
+        private float radius;
+
+        public GlideRoundTransform(Context context, float radius) {
+            super(context);
+            this.radius = radius;
+        }
+
+        @Override
+        protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+            return roundCrop(pool, toTransform);
+        }
+
+        private Bitmap roundCrop(BitmapPool pool, Bitmap source) {
+            if (source == null) return null;
+
+            Bitmap result = pool.get(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+            if (result == null) {
+                result = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+            }
+
+            Canvas canvas = new Canvas(result);
+            Paint paint = new Paint();
+            paint.setShader(new BitmapShader(source, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));
+            paint.setAntiAlias(true);
+            RectF rectF = new RectF(0f, 0f, source.getWidth(), source.getHeight());
+            canvas.drawRoundRect(rectF, radius, radius, paint);
+            return result;
+        }
+
+        @Override
+        public String getId() {
+            return getClass().getName() + Math.round(radius);
         }
     }
 
